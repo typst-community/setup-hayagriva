@@ -40,6 +40,8 @@ jobs:
 
 - **`hayagriva-token`:** The GitHub token to use when fetching the version list from [typst/hayagriva](https://github.com/typst/hayagriva/releases). You shouldn't have to touch this. The default is the `github.token` if you're on github.com or unauthenticated (rate limited) if you're not on github.com.
 
+- **`cache`:** Whether or not to use the workflow cache to cache the compiled `hayagriva` binary for future runs.
+
 ### Outputs
 
 - **`hayagriva-version`:** The version of Hayagriva that was installed. This will be something like `0.5.1` or similar.
