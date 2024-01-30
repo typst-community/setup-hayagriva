@@ -40,7 +40,9 @@ core.setOutput("cache-hit", !!found);
 if (!found) {
   const cacheDir = join(process.env.RUNNER_TEMP!, Math.random().toString());
   await mkdir(cacheDir, { recursive: true });
-  await $`cargo binstall hayagriva --version ${version} --force -y --install-path ${cacheDir}`;
+  await $({
+    stdio: "inherit",
+  })`cargo binstall hayagriva --version ${version} --force -y --install-path ${cacheDir}`;
   found = await tc.cacheDir(cacheDir, "hayagriva", version);
 }
 core.addPath(found);
