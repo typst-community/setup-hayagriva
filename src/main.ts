@@ -7,6 +7,7 @@ import { createUnauthenticatedAuth } from "@octokit/auth-unauthenticated";
 import { mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { $ } from "execa";
+import * as cache from "@actions/cache";
 
 const token = core.getInput("hayagriva-token");
 const octokit = token
@@ -35,16 +36,39 @@ if (versionRaw === "latest") {
 core.debug(`Resolved version: v${version}`);
 if (!version) throw new DOMException(`${versionRaw} resolved to ${version}`);
 
+const workflowCache = core.getBooleanInput("cache");
+
 let found = tc.find("hayagriva", version);
-core.setOutput("cache-hit", !!found);
+let cacheHit = !!found;
 if (!found) {
   const cacheDir = join(process.env.RUNNER_TEMP!, Math.random().toString());
   await mkdir(cacheDir, { recursive: true });
-  await $({
-    stdio: "inherit",
-  })`cargo binstall hayagriva --version ${version} --force -y --install-path ${cacheDir}`;
+
+  install_hayagriva: {
+    if (workflowCache) {
+      const primaryKey = `hayagriva-${version}`;
+      core.saveState("cache-key", primaryKey);
+      const hitKey = await cache.restoreCache([cacheDir], primaryKey);
+      if (hitKey) {
+        found = cacheDir;
+        cacheHit = true;
+        break install_hayagriva;
+      }
+    }
+
+    await $({
+      stdio: "inherit",
+    })`cargo binstall hayagriva --version ${version} --force -y --install-path ${cacheDir}`;
+
+    if (workflowCache) {
+      const primaryKey = core.getState("cache-key");
+      await cache.saveCache([cacheDir], primaryKey);
+    }
+  }
+
   found = await tc.cacheDir(cacheDir, "hayagriva", version);
 }
+core.setOutput("cache-hit", cacheHit);
 core.addPath(found);
 core.setOutput("hayagriva-version", version);
 core.info(`✅ hayagriva v${version} installed!`);
