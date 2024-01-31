@@ -70,3 +70,6 @@ core.setOutput("cache-hit", cacheHit);
 core.addPath(found);
 core.setOutput("hayagriva-version", version);
 core.info(`✅ hayagriva v${version} installed!`);
+
+// '@actions/cache' for some reason will hang unless exited.
+process.exit();
