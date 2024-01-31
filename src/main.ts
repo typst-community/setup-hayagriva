@@ -37,6 +37,7 @@ core.debug(`Resolved version: v${version}`);
 if (!version) throw new DOMException(`${versionRaw} resolved to ${version}`);
 
 const workflowCache = core.getBooleanInput("cache");
+const primaryKey = `hayagriva-${version}`;
 
 let found = tc.find("hayagriva", version);
 let cacheHit = !!found;
@@ -46,8 +47,6 @@ if (!found) {
 
   install_hayagriva: {
     if (workflowCache) {
-      const primaryKey = `hayagriva-${version}`;
-      core.saveState("cache-key", primaryKey);
       const hitKey = await cache.restoreCache([cacheDir], primaryKey);
       if (hitKey) {
         found = cacheDir;
@@ -61,7 +60,6 @@ if (!found) {
     })`cargo binstall hayagriva --version ${version} --force -y --install-path ${cacheDir}`;
 
     if (workflowCache) {
-      const primaryKey = core.getState("cache-key");
       await cache.saveCache([cacheDir], primaryKey);
     }
   }
