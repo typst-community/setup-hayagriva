@@ -57,7 +57,7 @@ if (!found) {
 
     await $({
       stdio: "inherit",
-    })`cargo binstall hayagriva --version ${version} --force -y --install-path ${cacheDir}`;
+    })`cargo binstall hayagriva --version ${version} --force -y --install-path ${cacheDir} --features="cli"`;
 
     if (workflowCache) {
       await cache.saveCache([cacheDir], primaryKey);
