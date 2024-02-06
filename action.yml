@@ -19,18 +19,9 @@ inputs:
 outputs:
   hayagriva-version:
     description: The version of Hayagriva that was installed. This will be something like '1.5.1' or similar.
-    value: ${{ steps.setup-hayagriva.outputs.hayagriva-version }}
   cache-hit:
     description: Whether or not Hayagriva was restored from the runner's cache or download anew.
-    value: ${{ steps.setup-hayagriva.outputs.cache-hit }}
 
 runs:
-  using: composite
-  steps:
-    - uses: cargo-bins/cargo-binstall@main
-    - id: setup-hayagriva
-      run: node "$GITHUB_ACTION_PATH/dist/main.js"
-      env:
-        INPUT_HAYAGRIVA-VERSION: ${{ inputs.hayagriva-version }}
-        INPUT_HAYAGRIVA-TOKEN: ${{ inputs.hayagriva-token }}
-        INPUT_CACHE-HIT: ${{ inputs.cache-hit }}
+  using: node20
+  main: dist/main.js

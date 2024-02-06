@@ -57,7 +57,7 @@ if (!found) {
 
     await $({
       stdio: "inherit",
-    })`cargo binstall hayagriva --version ${version} --force -y --install-path ${cacheDir} --features cli`;
+    })`cargo install hayagriva --features cli --version ${version} --force --root ${cacheDir}`;
 
     if (workflowCache) {
       await cache.saveCache([cacheDir], primaryKey);
@@ -67,7 +67,7 @@ if (!found) {
   found = await tc.cacheDir(cacheDir, "hayagriva", version);
 }
 core.setOutput("cache-hit", cacheHit);
-core.addPath(found);
+core.addPath(join(found, "bin"));
 core.setOutput("hayagriva-version", version);
 core.info(`✅ hayagriva v${version} installed!`);
 
