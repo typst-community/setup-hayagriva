@@ -29,5 +29,8 @@ runs:
   steps:
     - uses: cargo-bins/cargo-binstall@main
     - id: setup-hayagriva
-      uses: ./setup-hayagriva
-      with: ${{ inputs }}
+      run: node "$GITHUB_ACTION_PATH/dist/main.js"
+      env:
+        INPUT_HAYAGRIVA-VERSION: ${{ inputs.hayagriva-version }}
+        INPUT_HAYAGRIVA-TOKEN: ${{ inputs.hayagriva-token }}
+        INPUT_CACHE-HIT: ${{ inputs.cache-hit }}
